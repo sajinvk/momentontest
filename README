@@ -1,0 +1,7 @@
+Step 1 :
+Python (*.py or *.ipynb ) file to read the .dat files and format to CSV 
+
+Step 2 : Oracle SQL 
+Data loaded to Oracle database using SQL loader 
+
+Step 3 : Final step done via Excel PIVOT table 
