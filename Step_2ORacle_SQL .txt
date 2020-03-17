@@ -1,0 +1,78 @@
+--Data loaded using SQL Loader 
+create table users (userid INT , twitter_id int ) ;
+
+--select count(*) from users ;
+create table rating (userid INT , movie_id int , rating int , timestamp1 timestamp);
+
+--select count(*) from rating ; 
+select * from rating ;
+
+select * from movie ;
+
+
+
+create table movie (movieID int , 
+NAME varchar2(200)	, YEAR	INT,  
+GENRE_0	varchar2(30 ), 
+GENRE_1 varchar2(30 ), 	
+GENRE_2 varchar2(30 ),	
+GENRE_3	varchar2(30 ),
+GENRE_4	varchar2(30 ),
+GENRE_5	varchar2(30 ),
+GENRE_6	varchar2(30 ),
+GENRE_7 varchar2(30 ))
+
+--select count(*) from movie ;
+alter table unique_Genre 
+
+create table unique_genre (genre varchar2(20);
+--select * from unique_genre 
+
+--LIST MOVIES FROM RATING TABLE with atleast 2 ratings and ordered by rating average 
+--ASSUMPTION :
+  -- Popular movies would be rated by more number of users 
+  -- Average without looking into standard deviation could lead to wrong results .
+  
+select movie_id , count (rating) rating_count , round(avg(rating),2) rating_avg
+from rating 
+group by movie_id 
+--HAVINg count(rating) > 2
+order by rating_count desc
+
+
+select userid , count(rating)  from rating 
+group by userid 
+order  by count(rating) desc 
+
+-- Based on the result do not need to consider if there are couple of users whom might have biased the data . There are 50+ useres whom have rated atlease 5 movies 
+
+
+-- Subquery to get the movie name and year from movie_table 
+--List of movies which are popular 
+select M.name , year  , R.rating_avg , R.rating_count 
+from Movie M , (select movie_id , count (rating) rating_count , round(avg(rating),2) rating_avg
+from rating 
+group by movie_id ) R 
+where M.Movieid = R.movie_id
+order by year desc ,R.Rating_Avg desc 
+
+
+-- Most popular Genre by year 
+--
+-- selecting  movies which have been rated more than 1 and rating > 7 ( 7 - 10 is being given same value and no weighted average which would have been ideal )
+
+select M_FINAL.year , nvl(M_FINAL.genre_0,0)  genre0 , nvl(M_FINAL.genre_1,0) genre1 ,nvl( M_FINAL.genre_2 ,0)  genre2
+from  Movie M_FINAL ,
+  (
+select year , max(R.rating_avg), M.movieid abc 
+from Movie M ,
+(select movie_id , count (rating) rating_count , round(avg(rating),2) rating_avg
+from rating 
+group by movie_id ) R 
+where M.Movieid = R.movie_id
+and R.rating_avg > 7
+and R.rating_count > 1
+group by year , m.movieid 
+ ) final_view 
+where M_FINAL.movieid =final_view.abc
+order by M_FINAL.year desc 
